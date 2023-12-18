@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_zip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="관심 전시 / 다녀온 전시" />
+
+    <item
+        android:id="@+id/menu_about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="제작자 보기" />
+</menu>
