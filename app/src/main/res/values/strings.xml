@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SeoulMOA_zip</string>
+    <string name="api_url">http://openapi.seoul.go.kr:8088/</string>
+    <string name="api_key">6866717a676d6e6235385473434d47</string>
+    <string name="api_service">ListExhibitionOfSeoulMOAInfo</string>
+    <string name="api_type">json</string>
 </resources>

@@ -2,14 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_zip"
+        android:id="@+id/menu_like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="관심 전시 / 다녀온 전시" />
+        android:title="❤️ 관심 전시" />
+
+    <item
+        android:id="@+id/menu_went"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="🎨 다녀온 전시" />
 
     <item
         android:id="@+id/menu_about"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="제작자 보기" />
+        android:title="🙋🏻‍♀ ️제작자 보기" />
 </menu>

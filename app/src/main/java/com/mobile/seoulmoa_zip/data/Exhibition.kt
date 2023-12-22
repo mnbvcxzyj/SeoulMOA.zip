@@ -1,61 +1,28 @@
 package com.mobile.seoulmoa_zip.data
-//
-//data class Root(
-//    val listexhibitionofseoulmoainfo: Listexhibitionofseoulmoainfo,
-//)
-//
-//data class Listexhibitionofseoulmoainfo(
-//    @JsonProperty("list_total_count")
-//    val listTotalCount: Long,
-//    val result: Result,
-//    val row: List<Row>,
-//)
-//
-//data class Result(
-//    val code: String,
-//    val message: String,
-//)
-//
-//data class Row(
-//    @JsonProperty("dp_ex_no")
-//    val dpExNo: Long,
-//    @JsonProperty("dp_seq")
-//    val dpSeq: Long,
-//    @JsonProperty("dp_name")
-//    val dpName: String,
-//    @JsonProperty("dp_subname")
-//    val dpSubname: Map<String, Any>,
-//    @JsonProperty("dp_place")
-//    val dpPlace: String,
-//    @JsonProperty("dp_start")
-//    val dpStart: String,
-//    @JsonProperty("dp_end")
-//    val dpEnd: String,
-//    @JsonProperty("dp_homepage")
-//    val dpHomepage: Map<String, Any>,
-//    @JsonProperty("dp_event")
-//    val dpEvent: Map<String, Any>,
-//    @JsonProperty("dp_sponsor")
-//    val dpSponsor: Any?,
-//    @JsonProperty("dp_viewtime")
-//    val dpViewtime: Any?,
-//    @JsonProperty("dp_viewcharge")
-//    val dpViewcharge: Map<String, Any>,
-//    @JsonProperty("dp_art_part")
-//    val dpArtPart: Any?,
-//    @JsonProperty("dp_art_cnt")
-//    val dpArtCnt: String,
-//    @JsonProperty("dp_artist")
-//    val dpArtist: String,
-//    @JsonProperty("dp_viewpoint")
-//    val dpViewpoint: Any?,
-//    @JsonProperty("dp_info")
-//    val dpInfo: String,
-//    @JsonProperty("dp_main_img")
-//    val dpMainImg: String,
-//    @JsonProperty("dp_lnk")
-//    val dpLnk: String,
-//    @JsonProperty("dp_date")
-//    val dpDate: String,
-//)
-//
+
+import com.google.gson.annotations.SerializedName
+
+data class ExhibitionRoot(
+    @SerializedName("ListExhibitionOfSeoulMOAInfo") val listExhibitionOfSeoulMOAInfo: ExhibitionList
+)
+
+data class ExhibitionList(
+    @SerializedName("row") val exhibitions: List<Exhibition>
+)
+
+data class Exhibition(
+    @SerializedName("DP_EX_NO") val exhibitionNumber: String, // 전시NO
+    @SerializedName("DP_SEQ") val sequence: String, //DP_SEQ	전시일련번호
+    @SerializedName("DP_NAME") val name: String, // DP_NAME	전시회명
+    @SerializedName("DP_PLACE") val place: String?, // DP_PLACE	전시장소
+    @SerializedName("DP_START") val startDate: String, // DP_START	전시시작기간
+    @SerializedName("DP_END") val endDate: String, // DP_END	전시끝기간
+    @SerializedName("DP_SPONSOR") val sponsors: String, // DP_SPONSOR 주최 및 후원
+    @SerializedName("DP_VIEWTIME") val viewTime: String, //  DP_VIEWTIME	전시(관람)시간
+    @SerializedName("DP_ART_PART") val artPart: String, // DP_ART_PART	전시부문
+    @SerializedName("DP_ART_CNT") val artCount: String, // DP_ART_CNT	작품수
+    @SerializedName("DP_ARTIST") val artists: String, // DP_ARTIST	출품작가
+    @SerializedName("DP_INFO") val info: String, // DP_INFO	전시설명
+    @SerializedName("DP_MAIN_IMG") val mainImage: String?, // DP_MAIN_IMG	대표이미지
+    @SerializedName("DP_LNK") val link: String? // DP_LNK	바로가기링크
+)

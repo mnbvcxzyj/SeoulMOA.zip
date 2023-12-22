@@ -28,10 +28,16 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_zip -> {
-                // 관심 전시, 다녀온 전시 
+            R.id.menu_like -> {
+                // 관심 전시
                 true
             }
+
+            R.id.menu_went -> {
+                // 다녀온 전시
+                true
+            }
+
             R.id.menu_about -> {
                 // 제작자 보기
                 true
