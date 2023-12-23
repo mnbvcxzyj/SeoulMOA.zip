@@ -47,6 +47,25 @@ class MainActivity : BaseActivity() {
         val service = retrofit.create(IExhibitionService::class.java)
 
 
+//        val apiCallback = object : Callback<ExhibitionRoot> {
+//            override fun onResponse(
+//                call: Call<ExhibitionRoot>,
+//                response: Response<ExhibitionRoot>
+//            ) {
+//                if (response.isSuccessful) {
+//                    val root: ExhibitionRoot? = response.body()
+//                    adapter.exhibitions = root?.listExhibitionOfSeoulMOAInfo?.exhibitions
+//                    adapter.notifyDataSetChanged()
+//                } else {
+//                    Toast.makeText(this@MainActivity, "전시 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT)
+//                        .show()
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<ExhibitionRoot>, t: Throwable) {
+//                Toast.makeText(this@MainActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+//            }
+//        }
         val apiCallback = object : Callback<ExhibitionRoot> {
             override fun onResponse(
                 call: Call<ExhibitionRoot>,
@@ -54,6 +73,10 @@ class MainActivity : BaseActivity() {
             ) {
                 if (response.isSuccessful) {
                     val root: ExhibitionRoot? = response.body()
+                    // 각 전시 정보의 DP_INFO 클리닝
+                    root?.listExhibitionOfSeoulMOAInfo?.exhibitions?.forEach { exhibition ->
+                        exhibition.info = cleanHtmlString(exhibition.info)
+                    }
                     adapter.exhibitions = root?.listExhibitionOfSeoulMOAInfo?.exhibitions
                     adapter.notifyDataSetChanged()
                 } else {
@@ -78,6 +101,19 @@ class MainActivity : BaseActivity() {
         call.enqueue(apiCallback)
 
     }
+
+    // DP_INFO에 html 태그 및 특수문자 제거
+    private fun cleanHtmlString(html: String): String {
+        var result = html.replace(Regex("<[^>]*>"), "")
+        result = result.replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&apos;", "'")
+            .replace("&nbsp;", " ")
+        return result
+    }
+
 
     private fun showExhibitionDetail(exhibition: Exhibition) {
 

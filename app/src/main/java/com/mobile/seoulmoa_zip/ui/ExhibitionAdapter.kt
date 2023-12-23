@@ -26,7 +26,7 @@ class ExhibitionAdapter : RecyclerView.Adapter<ExhibitionAdapter.ExhibitionHolde
         val context = holder.itemView.context
         val exhibition = exhibitions?.get(position)
         if (exhibition != null) {
-            holder.itemBinding.tvTitle.text = exhibition.name // Assuming you have a TextView for title
+            holder.itemBinding.tvTitle.text = exhibition.name
             holder.itemBinding.tvText.text = exhibition.info
 
             Glide.with(context)

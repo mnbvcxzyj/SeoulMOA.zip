@@ -22,7 +22,7 @@ data class Exhibition(
     @SerializedName("DP_ART_PART") val artPart: String, // DP_ART_PART	전시부문
     @SerializedName("DP_ART_CNT") val artCount: String, // DP_ART_CNT	작품수
     @SerializedName("DP_ARTIST") val artists: String, // DP_ARTIST	출품작가
-    @SerializedName("DP_INFO") val info: String, // DP_INFO	전시설명
+    @SerializedName("DP_INFO") var info: String, // DP_INFO	전시설명
     @SerializedName("DP_MAIN_IMG") val mainImage: String?, // DP_MAIN_IMG	대표이미지
     @SerializedName("DP_LNK") val link: String? // DP_LNK	바로가기링크
 )
