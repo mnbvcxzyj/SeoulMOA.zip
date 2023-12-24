@@ -68,10 +68,9 @@ class ExhibitionAdapter(private val layoutId: Int) :
         when (holder) {
             is ExhibitionMainHolder -> holder.bind(exhibitions?.get(position), clickListener)
             is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
-            is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), clickListener)
+            is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
         }
     }
-
 
     interface OnItemClickListener {
         fun onItemClick(view: View, position: Int)
@@ -133,10 +132,15 @@ class ExhibitionLikeHolder(
 class ExhibitionVisitedHolder(
     private val itemBinding: VisitedlistItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
-    fun bind(exhibition: ExhibitionEntity?, clickListener: ExhibitionAdapter.OnItemClickListener?) {
+    fun bind(exhibition: ExhibitionEntity?, deleteListener: ExhibitionAdapter.OnDeleteClickListener?) {
         exhibition?.let {
             itemBinding.tvTitle.text = it.name
             itemBinding.tvText.text = it.info
+            Glide.with(itemView.context).load(exhibition.mainImage).into(itemBinding.imageView)
+
+            itemBinding.btnDelete.setOnClickListener {
+                deleteListener?.onDeleteClick(exhibition)
+            }
         }
     }
 }

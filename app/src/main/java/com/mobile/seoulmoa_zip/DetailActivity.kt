@@ -83,7 +83,7 @@ class DetailActivity : BaseActivity() {
                     artPart = it.artPart,
                     info = it.info,
                     isLiked = true, // 좋아요 표시
-                    isVisited = false,
+                    isVisited = null,
                     score = 0 // 점수 초기값 설정
                 )
                 saveToDatabase(exhibitionEntity, "메뉴 > ❤️관심 전시에 저장 완료!")
@@ -104,14 +104,13 @@ class DetailActivity : BaseActivity() {
                     endDate = it.endDate,
                     artPart = it.artPart,
                     info = it.info,
-                    isLiked = false, // 좋아요 표시
+                    isLiked = null, // 좋아요 표시
                     isVisited = true,
                     score = 0 // 점수 초기값 설정
                 )
                 saveToDatabase(exhibitionEntity, "메뉴 > 🎨다녀온 전시에 저장 완료!")
             }
         }
-
 
 
         /*GoogleMap 로딩이 완료될 경우 실행하는 Callback*/
@@ -164,7 +163,8 @@ class DetailActivity : BaseActivity() {
     private fun saveToDatabase(exhibition: ExhibitionEntity, toastMessage: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val existingExhibition = database.exhibitionDao().findExhibitionByNumber(exhibition.exhibitionNumber)
+                val existingExhibition =
+                    database.exhibitionDao().findExhibitionByNumber(exhibition.exhibitionNumber)
 
                 if (existingExhibition != null) {
                     val updatedExhibition = existingExhibition.apply {
@@ -178,20 +178,17 @@ class DetailActivity : BaseActivity() {
                 }
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DetailActivity, toastMessage, Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@DetailActivity, toastMessage, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 // 에러 처리
                 Log.e(TAG, "Failed to save exhibition", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DetailActivity, "저장에 실패했습니다.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@DetailActivity, "저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
-
-
 
 
 }

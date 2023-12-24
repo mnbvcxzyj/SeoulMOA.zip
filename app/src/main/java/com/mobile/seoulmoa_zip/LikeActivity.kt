@@ -32,9 +32,13 @@ class LikeActivity : BaseActivity() {
         adapter.setOnDeleteClickListener(object : ExhibitionAdapter.OnDeleteClickListener {
             override fun onDeleteClick(exhibitionEntity: ExhibitionEntity) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    db.exhibitionDao().deleteExhibition(exhibitionEntity)
+                    val updatedExhibition = exhibitionEntity.apply {
+                        isLiked = false
+                    }
+                    db.exhibitionDao().updateExhibition(updatedExhibition)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@LikeActivity, "삭제가 완료되었습니다!.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LikeActivity, "삭제가 완료되었습니다!.", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }
