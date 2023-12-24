@@ -10,6 +10,13 @@ import androidx.room.Update
 
 @Dao
 interface ExhibitionDao {
+    // 관심 전시 상태 업데이트
+    @Query("UPDATE exhibitions SET isLiked = :isLiked WHERE id = :exhibitionId")
+    suspend fun updateLikedStatus(exhibitionId: Long, isLiked: Boolean)
+
+    // 다녀온 전시 상태 업데이트
+    @Query("UPDATE exhibitions SET isVisited = :isVisited WHERE id = :exhibitionId")
+    suspend fun updateVisitedStatus(exhibitionId: Long, isVisited: Boolean)
 
     // 관심 전시 저장
     @Insert(onConflict = OnConflictStrategy.REPLACE)

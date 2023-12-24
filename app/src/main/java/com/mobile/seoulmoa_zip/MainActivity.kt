@@ -3,14 +3,10 @@ package com.mobile.seoulmoa_zip
 import BaseActivity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.mobile.seoulmoa_zip.data.Exhibition
+import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.data.ExhibitionRoot
 import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
 import com.mobile.seoulmoa_zip.network.IExhibitionService

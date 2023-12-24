@@ -2,16 +2,22 @@ package com.mobile.seoulmoa_zip
 
 import BaseActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mobile.seoulmoa_zip.data.ExhibitionDB
+import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.databinding.ActivityLikeBinding
-import com.mobile.seoulmoa_zip.databinding.ActivityVisitedBinding
 import com.mobile.seoulmoa_zip.ui.ExhibitionAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LikeActivity : BaseActivity() {
     lateinit var likeBinding: ActivityLikeBinding
     lateinit var adapter: ExhibitionAdapter
+    private val db by lazy { ExhibitionDB.getDatabase(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,16 +29,18 @@ class LikeActivity : BaseActivity() {
         likeBinding.rvLike.adapter = adapter
         likeBinding.rvLike.layoutManager = LinearLayoutManager(this)
 
-        likedExhibitions()
+        adapter.setOnDeleteClickListener(object : ExhibitionAdapter.OnDeleteClickListener {
+            override fun onDeleteClick(exhibitionEntity: ExhibitionEntity) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    db.exhibitionDao().deleteExhibition(exhibitionEntity)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@LikeActivity, "삭제가 완료되었습니다!.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
 
-//        adapter.setOnItemClickListener(object : ExhibitionAdapter.OnItemClickListner {
-//            override fun onItemClick(view: View, position: Int) {
-//                val exhibition = adapter.exhibitions?.get(position)
-//                val intent = Intent(this@VisitedActivity, VisitedActivity::class.java)
-//                intent.putExtra("exhibition", exhibition)
-//                startActivity(intent)
-//            }
-//        })
+        likedExhibitions()
     }
 
     private fun likedExhibitions() {

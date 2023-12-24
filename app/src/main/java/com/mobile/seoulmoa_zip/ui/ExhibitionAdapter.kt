@@ -17,8 +17,9 @@ import com.mobile.seoulmoa_zip.databinding.VisitedlistItemBinding
 class ExhibitionAdapter(private val layoutId: Int) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     var exhibitions: List<Exhibition>? = null
-    var myExhibitions : List<ExhibitionEntity>? = null
+    var myExhibitions: List<ExhibitionEntity>? = null
     private var clickListener: OnItemClickListener? = null
+    private var deleteListener: OnDeleteClickListener? = null
 
     companion object {
         val TYPE_MAIN = R.layout.list_item
@@ -33,6 +34,7 @@ class ExhibitionAdapter(private val layoutId: Int) :
             else -> 0
         }
     }
+
     override fun getItemViewType(position: Int): Int = layoutId
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -40,13 +42,13 @@ class ExhibitionAdapter(private val layoutId: Int) :
             TYPE_MAIN -> {
                 val itemBinding =
                     ListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ExhibitionMainHolder(itemBinding, clickListener)
+                ExhibitionMainHolder(itemBinding)
             }
 
             TYPE_LIKE -> {
                 val likeItemBinding =
                     LikelistItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                ExhibitionLikeHolder(likeItemBinding, clickListener)
+                ExhibitionLikeHolder(likeItemBinding)
             }
 
             TYPE_VISITED -> {
@@ -55,7 +57,7 @@ class ExhibitionAdapter(private val layoutId: Int) :
                     parent,
                     false
                 )
-                ExhibitionVisitedHolder(visitedItemBinding, clickListener)
+                ExhibitionVisitedHolder(visitedItemBinding)
             }
 
             else -> throw IllegalArgumentException("해당하는 뷰가 없습니다!")
@@ -65,23 +67,34 @@ class ExhibitionAdapter(private val layoutId: Int) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ExhibitionMainHolder -> holder.bind(exhibitions?.get(position), clickListener)
-            is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), clickListener)
+            is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
             is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), clickListener)
         }
     }
+
+
     interface OnItemClickListener {
         fun onItemClick(view: View, position: Int)
     }
+
+    interface OnDeleteClickListener {
+        fun onDeleteClick(exhibitionEntity: ExhibitionEntity)
+    }
+
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.clickListener = listener
     }
 
+    fun setOnDeleteClickListener(listener: OnDeleteClickListener) {
+        this.deleteListener = listener
+    }
+
+
 }
 
 class ExhibitionMainHolder(
-    private val itemBinding: ListItemBinding,
-    private val clickListener: ExhibitionAdapter.OnItemClickListener?
+    private val itemBinding: ListItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
     fun bind(exhibition: Exhibition?, clickListener: ExhibitionAdapter.OnItemClickListener?) {
         exhibition?.let {
@@ -101,25 +114,24 @@ class ExhibitionMainHolder(
 
 
 class ExhibitionLikeHolder(
-    private val itemBinding: LikelistItemBinding,
-    private val clickListener: ExhibitionAdapter.OnItemClickListener?
+    private val itemBinding: LikelistItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
-    fun bind(exhibition: ExhibitionEntity?, clickListener: ExhibitionAdapter.OnItemClickListener? ) {
-        exhibition?.let {
-            itemBinding.tvTitle.text = it.name
-            itemBinding.tvText.text = it.info
+    fun bind(exhibitionEntity: ExhibitionEntity?, deleteListener: ExhibitionAdapter.OnDeleteClickListener?) {
+        exhibitionEntity?.let { exhibition ->
+            itemBinding.tvTitle.text = exhibition.name
+            itemBinding.tvText.text = exhibition.info
+            Glide.with(itemView.context).load(exhibition.mainImage).into(itemBinding.imageView)
 
-            Glide.with(itemView.context)
-                .load(it.mainImage)
-                .into(itemBinding.imageView)
-
+            itemBinding.btnDelete.setOnClickListener {
+                deleteListener?.onDeleteClick(exhibition)
+            }
         }
     }
 }
 
+
 class ExhibitionVisitedHolder(
-    private val itemBinding: VisitedlistItemBinding,
-    private val clickListener: ExhibitionAdapter.OnItemClickListener?
+    private val itemBinding: VisitedlistItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
     fun bind(exhibition: ExhibitionEntity?, clickListener: ExhibitionAdapter.OnItemClickListener?) {
         exhibition?.let {
