@@ -1,9 +1,9 @@
 package com.mobile.seoulmoa_zip.ui
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.mobile.seoulmoa_zip.R
@@ -20,6 +20,9 @@ class ExhibitionAdapter(private val layoutId: Int) :
     var myExhibitions: List<ExhibitionEntity>? = null
     private var clickListener: OnItemClickListener? = null
     private var deleteListener: OnDeleteClickListener? = null
+    private var ratingBarListener: OnRatingBarListener? = null
+
+
 
     companion object {
         val TYPE_MAIN = R.layout.list_item
@@ -68,7 +71,7 @@ class ExhibitionAdapter(private val layoutId: Int) :
         when (holder) {
             is ExhibitionMainHolder -> holder.bind(exhibitions?.get(position), clickListener)
             is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
-            is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
+            is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), deleteListener, ratingBarListener)
         }
     }
 
@@ -79,14 +82,19 @@ class ExhibitionAdapter(private val layoutId: Int) :
     interface OnDeleteClickListener {
         fun onDeleteClick(exhibitionEntity: ExhibitionEntity)
     }
-
-
+    interface OnRatingBarListener {
+        fun onRatingChanged(exhibition: ExhibitionEntity, rating: Float)
+    }
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.clickListener = listener
     }
 
     fun setOnDeleteClickListener(listener: OnDeleteClickListener) {
         this.deleteListener = listener
+    }
+
+    fun setOnRatingBarListener(listner: OnRatingBarListener) {
+        this.ratingBarListener = listner
     }
 
 
@@ -132,7 +140,11 @@ class ExhibitionLikeHolder(
 class ExhibitionVisitedHolder(
     private val itemBinding: VisitedlistItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
-    fun bind(exhibition: ExhibitionEntity?, deleteListener: ExhibitionAdapter.OnDeleteClickListener?) {
+    fun bind(
+        exhibition: ExhibitionEntity?,
+        deleteListener: ExhibitionAdapter.OnDeleteClickListener?,
+        ratingBarListener: ExhibitionAdapter.OnRatingBarListener?
+    ) {
         exhibition?.let {
             itemBinding.tvTitle.text = it.name
             itemBinding.tvText.text = it.info
@@ -141,8 +153,19 @@ class ExhibitionVisitedHolder(
             itemBinding.btnDelete.setOnClickListener {
                 deleteListener?.onDeleteClick(exhibition)
             }
+
+            // 현재 별점 보여주기
+            itemBinding.ratingBar.rating = it.score ?: 0f
+            itemBinding.tvScore.text = it.score.toString()
+
+            itemBinding.ratingBar.onRatingBarChangeListener = RatingBar.OnRatingBarChangeListener { _, rating, _ ->
+                it.score = rating
+                ratingBarListener?.onRatingChanged(it, rating)
+            }
+
         }
     }
+
 }
 
 

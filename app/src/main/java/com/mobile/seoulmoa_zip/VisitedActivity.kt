@@ -1,15 +1,12 @@
 package com.mobile.seoulmoa_zip
 
 import BaseActivity
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mobile.seoulmoa_zip.data.ExhibitionDB
 import com.mobile.seoulmoa_zip.data.ExhibitionEntity
-import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
 import com.mobile.seoulmoa_zip.databinding.ActivityVisitedBinding
 import com.mobile.seoulmoa_zip.ui.ExhibitionAdapter
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +35,7 @@ class VisitedActivity : BaseActivity() {
             override fun onDeleteClick(exhibitionEntity: ExhibitionEntity) {
                 CoroutineScope(Dispatchers.IO).launch {
                     val updatedExhibition = exhibitionEntity.apply {
-                            isVisited = false
+                        isVisited = false
                     }
                     db.exhibitionDao().updateExhibition(updatedExhibition)
                     withContext(Dispatchers.Main) {
@@ -49,8 +46,24 @@ class VisitedActivity : BaseActivity() {
             }
         })
 
-        visitedExhibitions()
+        adapter.setOnRatingBarListener(object : ExhibitionAdapter.OnRatingBarListener {
+            override fun onRatingChanged(exhibition: ExhibitionEntity, rating: Float) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    val updatedExhibition = exhibition.apply {
+                        score = rating
+                    }
+                    db.exhibitionDao().updateExhibition(updatedExhibition)
 
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@VisitedActivity, "별점을 변경하였습니다!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            }
+
+
+        })
+        visitedExhibitions()
 
     }
 

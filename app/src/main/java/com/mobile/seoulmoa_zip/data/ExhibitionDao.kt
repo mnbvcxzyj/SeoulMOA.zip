@@ -44,4 +44,7 @@ interface ExhibitionDao {
     // 다녀온 전시 목록 조회
     @Query("SELECT * FROM exhibitions WHERE isVisited = 1")
     fun getVisitedExhibitions(): LiveData<List<ExhibitionEntity>>
+
+    @Query("UPDATE exhibitions SET score = :score WHERE id = :exhibitionId")
+    suspend fun updateScore(exhibitionId: Long, score: Float)
 }

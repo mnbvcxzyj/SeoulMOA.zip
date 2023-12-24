@@ -84,7 +84,7 @@ class DetailActivity : BaseActivity() {
                     info = it.info,
                     isLiked = true, // 좋아요 표시
                     isVisited = null,
-                    score = 0 // 점수 초기값 설정
+                    score = 0.0f // 점수 초기값 설정
                 )
                 saveToDatabase(exhibitionEntity, "메뉴 > ❤️관심 전시에 저장 완료!")
             }
@@ -106,7 +106,7 @@ class DetailActivity : BaseActivity() {
                     info = it.info,
                     isLiked = null, // 좋아요 표시
                     isVisited = true,
-                    score = 0 // 점수 초기값 설정
+                    score = 0.0f // 점수 초기값 설정
                 )
                 saveToDatabase(exhibitionEntity, "메뉴 > 🎨다녀온 전시에 저장 완료!")
             }
