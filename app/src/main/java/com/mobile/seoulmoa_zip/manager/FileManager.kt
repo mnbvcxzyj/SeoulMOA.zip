@@ -1,4 +1,4 @@
-package com.mobile.seoulmoa_zip
+package com.mobile.seoulmoa_zip.manager
 
 import android.content.Context
 import android.graphics.Bitmap

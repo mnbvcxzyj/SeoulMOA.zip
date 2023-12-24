@@ -1,10 +1,15 @@
 package com.mobile.seoulmoa_zip
 
 import BaseActivity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.mobile.seoulmoa_zip.data.Exhibition
 import com.mobile.seoulmoa_zip.data.ExhibitionRoot
 import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
@@ -30,7 +35,7 @@ class MainActivity : BaseActivity() {
         setContentView(mainBinding.root)
         setupToolbar()
 
-        adapter = ExhibitionAdapter()
+        adapter = ExhibitionAdapter(ExhibitionAdapter.TYPE_MAIN)
         mainBinding.rvExhibitions.adapter = adapter
         mainBinding.rvExhibitions.layoutManager = LinearLayoutManager(this)
 
@@ -41,31 +46,23 @@ class MainActivity : BaseActivity() {
 
 
         fetchExhibitions()
+
+        adapter.setOnItemClickListener(object : ExhibitionAdapter.OnItemClickListener {
+            override fun onItemClick(view: View, position: Int) {
+                val exhibition = adapter.exhibitions?.get(position)
+                exhibition?.let {
+                    val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+                        putExtra("exhibition", it)
+                    }
+                    startActivity(intent)
+                }
+            }
+        })
     }
 
     private fun fetchExhibitions() {
         val service = retrofit.create(IExhibitionService::class.java)
 
-
-//        val apiCallback = object : Callback<ExhibitionRoot> {
-//            override fun onResponse(
-//                call: Call<ExhibitionRoot>,
-//                response: Response<ExhibitionRoot>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val root: ExhibitionRoot? = response.body()
-//                    adapter.exhibitions = root?.listExhibitionOfSeoulMOAInfo?.exhibitions
-//                    adapter.notifyDataSetChanged()
-//                } else {
-//                    Toast.makeText(this@MainActivity, "전시 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT)
-//                        .show()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ExhibitionRoot>, t: Throwable) {
-//                Toast.makeText(this@MainActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-//            }
-//        }
         val apiCallback = object : Callback<ExhibitionRoot> {
             override fun onResponse(
                 call: Call<ExhibitionRoot>,
@@ -73,10 +70,11 @@ class MainActivity : BaseActivity() {
             ) {
                 if (response.isSuccessful) {
                     val root: ExhibitionRoot? = response.body()
-                    // 각 전시 정보의 DP_INFO 클리닝
+
                     root?.listExhibitionOfSeoulMOAInfo?.exhibitions?.forEach { exhibition ->
                         exhibition.info = cleanHtmlString(exhibition.info)
                     }
+
                     adapter.exhibitions = root?.listExhibitionOfSeoulMOAInfo?.exhibitions
                     adapter.notifyDataSetChanged()
                 } else {
@@ -95,7 +93,7 @@ class MainActivity : BaseActivity() {
             getString(R.string.api_type),
             getString(R.string.api_service),
             1,
-            100,
+            10,
         )
 
         call.enqueue(apiCallback)
@@ -114,9 +112,5 @@ class MainActivity : BaseActivity() {
         return result
     }
 
-
-    private fun showExhibitionDetail(exhibition: Exhibition) {
-
-    }
 }
 

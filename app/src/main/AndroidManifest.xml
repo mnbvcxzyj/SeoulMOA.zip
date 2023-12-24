@@ -23,6 +23,16 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDAUbWNxvhPNxgzWCEdpLWKQmGBMjwcmdI" />
+
+        <activity
+            android:name=".DetailActivity"
+            android:exported="false" />
+
+        <activity android:name=".LikeActivity" />
+        <activity android:name=".VisitedActivity" />
+        <activity android:name=".AboutActivity" />
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
