@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".DetailActivity">
 
     <include
         android:id="@+id/toolbar"
@@ -55,9 +56,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
-        android:text="바로가기 링크"
-        android:linksClickable="true"
         android:autoLink="web"
+        android:linksClickable="true"
+        android:text="바로가기 링크"
         app:layout_constraintEnd_toEndOf="@+id/tv_date"
         app:layout_constraintStart_toStartOf="@+id/tv_date"
         app:layout_constraintTop_toBottomOf="@+id/tv_date" />
@@ -78,33 +79,48 @@
             android:id="@+id/tv_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="전시회 설명" />
+            android:text="설명" />
+
     </androidx.core.widget.NestedScrollView>
+
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_location"
+
+        map:cameraBearing="112.5"
+        map:cameraTilt="50"
+        map:cameraZoom="13"
+        map:mapType="normal"
+        map:uiCompass="true"
+        map:uiRotateGestures="true"
+        map:uiScrollGestures="false"
+        map:uiTiltGestures="true"
+        map:uiZoomControls="true"
+        map:uiZoomGestures="true"
+
+        tools:context=".DetailActivity" />
+
 
     <TextView
         android:id="@+id/tv_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="280dp"
+        android:layout_marginBottom="256dp"
         android:text="전시회 위치 / 주변 카페"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.09"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints" />
-
-<!--    <fragment-->
-<!--        android:id="@+id/map"-->
-<!--        android:name="com.google.android.gms.maps.SupportMapFragment"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="150dp"-->
-<!--        android:layout_marginBottom="120dp"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.0"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        tools:context=".DetailActivity"-->
-<!--        tools:ignore="MissingConstraints" />-->
+        app:layout_constraintHorizontal_bias="0.087"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_like"
@@ -115,8 +131,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@mipmap/ic_heart"
-        tools:ignore="DuplicateIds,MissingConstraints" />
+        app:srcCompat="@mipmap/ic_heart" />
 
     <ImageButton
         android:id="@+id/btn_save"

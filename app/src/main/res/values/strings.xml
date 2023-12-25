@@ -4,4 +4,5 @@
     <string name="api_key">6866717a676d6e6235385473434d47</string>
     <string name="api_service">ListExhibitionOfSeoulMOAInfo</string>
     <string name="api_type">json</string>
+    <string name="map_key">AIzaSyCCYGzhqOuGMBOE2fH9oHwkmpi1epyPEVA</string>
 </resources>

@@ -104,7 +104,7 @@ class MainActivity : BaseActivity() {
             getString(R.string.api_type),
             getString(R.string.api_service),
             1,
-            200,
+            100,
         )
 
         call.enqueue(apiCallback)

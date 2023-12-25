@@ -11,14 +11,22 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.model.PlaceLikelihood
 import com.mobile.seoulmoa_zip.data.Exhibition
 import com.mobile.seoulmoa_zip.data.ExhibitionDB
 import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.databinding.ActivityDetailBinding
+import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
 import com.mobile.seoulmoa_zip.manager.FileManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class DetailActivity : BaseActivity() {
-    val detailBinding by lazy {
-        ActivityDetailBinding.inflate(layoutInflater)
-    }
+class DetailActivity : BaseActivity(){
+    lateinit var detailBinding: ActivityDetailBinding
 
     val fileManager: FileManager by lazy {
         FileManager(applicationContext)
@@ -50,23 +56,41 @@ class DetailActivity : BaseActivity() {
     // 이미지 변수
     var img: String? = null
 
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        detailBinding = ActivityDetailBinding.inflate(layoutInflater)
+
         setContentView(detailBinding.root)
+
         setupToolbar()
 
-        // 이미지 url 전달
-        val url = intent.getStringExtra("url")
+        if (!Places.isInitialized()) {
+            Places.initialize(applicationContext, R.string.map_key.toString())
+        }
 
-//
-//        val mapFragment : SupportMapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-//
-//        mapFragment.getMapAsync(mapReadyCallback)
+        val placesClient = Places.createClient(this)
 
-        val exhibition = intent.getSerializableExtra("exhibition") as? Exhibition
-        exhibition?.let { showExhibitionDetails(it) }
+        geocoder = Geocoder(this) // Geocoder 초기화
+
+
+        val mapFragment: SupportMapFragment =
+            supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+
+        mapFragment.getMapAsync(mapReadyCallback)
+//
+//        val exhibition = intent.getSerializableExtra("exhibition") as? Exhibition
+
+        val exhibition = intent.extras?.getSerializable("exhibition") as? Exhibition
+
+        exhibition?.let {
+            showExhibitionDetails(it)
+            mapFragment.getMapAsync { googleMap ->
+                placeMarker(geocoder, it.place, googleMap)
+            }
+        }
 
 // 좋아요 버튼 클릭 리스너
         detailBinding.btnLike.setOnClickListener {
@@ -111,41 +135,32 @@ class DetailActivity : BaseActivity() {
                 saveToDatabase(exhibitionEntity, "메뉴 > 🎨다녀온 전시에 저장 완료!")
             }
         }
+    }
 
+    val mapReadyCallback = OnMapReadyCallback { map ->
+        googleMap = map
+        Log.d(TAG, "GoogleMap is ready")
+    }
 
-        /*GoogleMap 로딩이 완료될 경우 실행하는 Callback*/
-        val mapReadyCallback = OnMapReadyCallback { map ->
-            googleMap = map
-            Log.d(TAG, "Googlemap ready")
-
-            // 마커 클릭 이벤트 처리
-            googleMap.setOnMarkerClickListener { marker ->
-                Toast.makeText(applicationContext, marker.tag.toString(), Toast.LENGTH_SHORT)
-                    .show()
-                false // true일 경우 이벤트처리 종료이므로 info window 미출력
+    fun placeMarker(geocoder: Geocoder, address: String?, googleMap: GoogleMap) {
+        if (!address.isNullOrEmpty()) {
+            try {
+                val addressList = geocoder.getFromLocationName(address, 1)
+                if (!addressList.isNullOrEmpty()) {
+                    val location = addressList[0]
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    googleMap.addMarker(MarkerOptions().position(latLng).title("Exhibition").icon(
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)))
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16F))
+                } else {
+                    Log.e(TAG, "주소 변환 결과가 없습니다.")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Geocoder 실패: ", e)
             }
-            // 마커 InfoWindow 클릭 이벤트 처리
-            googleMap.setOnInfoWindowClickListener { marker ->
-                Toast.makeText(applicationContext, marker.title, Toast.LENGTH_SHORT).show()
-            }
-
-            // 지도 특정 지점 클릭 이벤트 처리
-            googleMap.setOnMapClickListener { latLng: LatLng ->
-                Toast.makeText(
-                    applicationContext,
-                    latLng.toString(), Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            // 지도 특정 지점 롱클릭 이벤트 처리
-            googleMap.setOnMapLongClickListener { latLng: LatLng ->
-                Toast.makeText(applicationContext, latLng.toString(), Toast.LENGTH_SHORT).show()
-            }
-
-            //            polylineOptions = PolylineOptions()
+        } else {
+            Log.e(TAG, "주소가 제공되지 않았습니다.")
         }
-
-
     }
 
     private fun showExhibitionDetails(exhibition: Exhibition) {
@@ -189,6 +204,5 @@ class DetailActivity : BaseActivity() {
             }
         }
     }
-
 
 }
