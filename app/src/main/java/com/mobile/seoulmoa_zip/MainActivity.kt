@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mobile.seoulmoa_zip.data.Exhibition
 import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.data.ExhibitionRoot
 import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
@@ -54,30 +55,44 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
+
+        mainBinding.btnSearch.setOnClickListener {
+            val keyword = mainBinding.etSearch.text.toString()
+            fetchExhibitions(keyword)
+        }
     }
 
-    private fun fetchExhibitions() {
+    private fun fetchExhibitions(keyword: String = "") {
         val service = retrofit.create(IExhibitionService::class.java)
 
         val apiCallback = object : Callback<ExhibitionRoot> {
+
             override fun onResponse(
                 call: Call<ExhibitionRoot>,
                 response: Response<ExhibitionRoot>
             ) {
                 if (response.isSuccessful) {
-                    val root: ExhibitionRoot? = response.body()
+                    val exhibitions = if (keyword.isNotEmpty()) {
+                        response.body()?.listExhibitionOfSeoulMOAInfo?.exhibitions?.filter {
+                            it.name.contains(keyword, ignoreCase = true)
+                        }
 
-                    root?.listExhibitionOfSeoulMOAInfo?.exhibitions?.forEach { exhibition ->
-                        exhibition.info = cleanHtmlString(exhibition.info)
+                    } else {
+                        response.body()?.listExhibitionOfSeoulMOAInfo?.exhibitions
                     }
 
-                    adapter.exhibitions = root?.listExhibitionOfSeoulMOAInfo?.exhibitions
+                    exhibitions?.forEach {
+                        it.info = cleanHtmlString(it.info ?: "")
+                    }
+
+                    adapter.exhibitions = exhibitions
                     adapter.notifyDataSetChanged()
                 } else {
                     Toast.makeText(this@MainActivity, "전시 정보를 가져오는 데 실패했습니다.", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
+
 
             override fun onFailure(call: Call<ExhibitionRoot>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "네트워크 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
@@ -89,7 +104,7 @@ class MainActivity : BaseActivity() {
             getString(R.string.api_type),
             getString(R.string.api_service),
             1,
-            10,
+            200,
         )
 
         call.enqueue(apiCallback)

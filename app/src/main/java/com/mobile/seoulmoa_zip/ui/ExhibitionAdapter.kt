@@ -167,6 +167,3 @@ class ExhibitionVisitedHolder(
     }
 
 }
-
-
-
