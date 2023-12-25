@@ -21,8 +21,7 @@ class ExhibitionAdapter(private val layoutId: Int) :
     private var clickListener: OnItemClickListener? = null
     private var deleteListener: OnDeleteClickListener? = null
     private var ratingBarListener: OnRatingBarListener? = null
-
-
+    private var modifyListener : OnModifyListener? = null
 
     companion object {
         val TYPE_MAIN = R.layout.list_item
@@ -71,7 +70,11 @@ class ExhibitionAdapter(private val layoutId: Int) :
         when (holder) {
             is ExhibitionMainHolder -> holder.bind(exhibitions?.get(position), clickListener)
             is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
-            is ExhibitionVisitedHolder -> holder.bind(myExhibitions?.get(position), deleteListener, ratingBarListener)
+            is ExhibitionVisitedHolder -> modifyListener?.let {
+                holder.bind(myExhibitions?.get(position), deleteListener, ratingBarListener,
+                    it
+                )
+            }
         }
     }
 
@@ -85,6 +88,11 @@ class ExhibitionAdapter(private val layoutId: Int) :
     interface OnRatingBarListener {
         fun onRatingChanged(exhibition: ExhibitionEntity, rating: Float)
     }
+
+    interface OnModifyListener {
+        fun onModifyChanged(exhibition: ExhibitionEntity)
+    }
+
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.clickListener = listener
     }
@@ -95,6 +103,10 @@ class ExhibitionAdapter(private val layoutId: Int) :
 
     fun setOnRatingBarListener(listner: OnRatingBarListener) {
         this.ratingBarListener = listner
+    }
+
+    fun setOnModifyListener(listener : OnModifyListener){
+        this.modifyListener = listener
     }
 
 
@@ -143,11 +155,12 @@ class ExhibitionVisitedHolder(
     fun bind(
         exhibition: ExhibitionEntity?,
         deleteListener: ExhibitionAdapter.OnDeleteClickListener?,
-        ratingBarListener: ExhibitionAdapter.OnRatingBarListener?
+        ratingBarListener: ExhibitionAdapter.OnRatingBarListener?,
+        modifyListener: ExhibitionAdapter.OnModifyListener
     ) {
         exhibition?.let {
             itemBinding.tvTitle.text = it.name
-            itemBinding.tvText.text = it.info
+            itemBinding.etMemo.setText(it.memo)
             Glide.with(itemView.context).load(exhibition.mainImage).into(itemBinding.imageView)
 
             itemBinding.btnDelete.setOnClickListener {
@@ -162,6 +175,24 @@ class ExhibitionVisitedHolder(
                 it.score = rating
                 ratingBarListener?.onRatingChanged(it, rating)
             }
+
+            // 메모 표시
+            itemBinding.etMemo.setText(it.memo)
+
+            itemBinding.etMemo.setOnFocusChangeListener { v, hasFocus ->
+                if (!hasFocus) {
+                    val memoText = itemBinding.etMemo.text.toString()
+                    exhibition.memo = memoText
+                }
+            }
+
+            // 메모 저장 버튼에 리스너 설정
+            itemBinding.btnSave.setOnClickListener {
+                val newMemo = itemBinding.etMemo.text.toString()
+                exhibition?.memo = newMemo
+                modifyListener?.onModifyChanged(exhibition!!)
+            }
+
 
         }
     }

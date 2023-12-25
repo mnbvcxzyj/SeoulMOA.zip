@@ -30,7 +30,12 @@
         <activity android:name=".DetailActivity" />
 
         <activity android:name=".LikeActivity" />
-        <activity android:name=".VisitedActivity" />
+
+        <activity android:name=".VisitedActivity"
+            android:windowSoftInputMode="adjustPan">
+        </activity>
+
+
         <activity android:name=".AboutActivity" />
 
 

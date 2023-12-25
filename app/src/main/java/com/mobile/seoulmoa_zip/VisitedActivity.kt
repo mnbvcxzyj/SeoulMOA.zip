@@ -61,8 +61,22 @@ class VisitedActivity : BaseActivity() {
                 }
             }
 
-
         })
+
+        adapter.setOnModifyListener(object : ExhibitionAdapter.OnModifyListener {
+
+
+            override fun onModifyChanged(exhibition: ExhibitionEntity) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    db.exhibitionDao().updateExhibition(exhibition)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@VisitedActivity, "메모가 업데이트 되었습니다!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+
+
         visitedExhibitions()
 
     }

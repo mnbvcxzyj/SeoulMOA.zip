@@ -19,5 +19,6 @@ data class ExhibitionEntity(
     val link: String?, // 바로가기링크
     var isLiked: Boolean?,
     var isVisited: Boolean?,
-    var score: Float?
+    var score: Float?,
+    var memo : String? = "메모를 입력하세요"
 )
