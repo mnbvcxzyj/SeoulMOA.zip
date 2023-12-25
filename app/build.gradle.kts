@@ -97,4 +97,8 @@ dependencies {
     // Google Places API
     implementation("com.google.android.libraries.places:places:3.3.0")
 
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0") // OkHttp for network requests
+
+    implementation ("com.google.code.gson:gson:2.8.6")
+
 }
