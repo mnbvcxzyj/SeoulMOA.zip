@@ -179,14 +179,14 @@ class ExhibitionVisitedHolder(
             // 메모 표시
             itemBinding.etMemo.setText(it.memo)
 
-            itemBinding.etMemo.setOnFocusChangeListener { v, hasFocus ->
+            itemBinding.etMemo.setOnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
                     val memoText = itemBinding.etMemo.text.toString()
                     exhibition.memo = memoText
                 }
             }
 
-            // 메모 저장 버튼에 리스너 설정
+            // 변경 사항 저장 버튼
             itemBinding.btnSave.setOnClickListener {
                 val newMemo = itemBinding.etMemo.text.toString()
                 exhibition?.memo = newMemo

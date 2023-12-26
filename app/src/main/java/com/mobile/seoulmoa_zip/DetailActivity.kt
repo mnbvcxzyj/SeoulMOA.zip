@@ -70,8 +70,6 @@ class DetailActivity : BaseActivity(){
             Places.initialize(applicationContext, R.string.map_key.toString())
         }
 
-        val placesClient = Places.createClient(this)
-
 
         geocoder = Geocoder(this) // Geocoder 초기화
 
@@ -79,7 +77,7 @@ class DetailActivity : BaseActivity(){
         val mapFragment: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(mapReadyCallback)
-//
+
 //        val exhibition = intent.getSerializableExtra("exhibition") as? Exhibition
 
         val exhibition = intent.extras?.getSerializable("exhibition") as? Exhibition
@@ -90,8 +88,6 @@ class DetailActivity : BaseActivity(){
                 placeMarker(geocoder, it.place, googleMap)
             }
         }
-
-//        placeMarker(geocoder, exhibition?.place, googleMap)
 
 // 좋아요 버튼 클릭 리스너
         detailBinding.btnLike.setOnClickListener {
@@ -175,16 +171,12 @@ class DetailActivity : BaseActivity(){
     fun fetchNearbyCafes(location: LatLng) {
         // OkHttpClient 인스턴스 생성
         val client = OkHttpClient()
-
-//        37.56410, 126.9738
         val latitude = location.latitude
-//        val latitude =  37.56410
         val longitude = location.longitude
-//        val longitude = 126.9738
 
-        val radiusInMeters = 9000
+        val radiusInMeters = 1500
 
-        val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "keyword=&location=$latitude,$longitude&radius=1000&type=cafe&key=AIzaSyCCYGzhqOuGMBOE2fH9oHwkmpi1epyPEVA"
+        val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "keyword=&location=$latitude,$longitude&radius=$radiusInMeters&type=cafe&key=${R.string.map_key}"
 
         // 요청 생성
         val request = Request.Builder().url(url).build()
@@ -201,7 +193,6 @@ class DetailActivity : BaseActivity(){
                     // 응답 처리
                     runOnUiThread {
                         try {
-                            // Gson을 사용하여 JSON 응답 파싱
                             val gson = Gson()
                             val nearbySearchResponse = gson.fromJson(responseData, NearbySearchResponse::class.java)
 
@@ -213,7 +204,7 @@ class DetailActivity : BaseActivity(){
                                 googleMap.addMarker(MarkerOptions()
                                     .position(cafeLocation)
                                     .title(result.name)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))) // 초록색 마커
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                             }
                         } catch (e: Exception) {
                             Log.e(TAG, "Error parsing JSON or adding markers", e)
