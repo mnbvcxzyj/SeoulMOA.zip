@@ -25,7 +25,6 @@ class ExhibitionAdapter(private val layoutId: Int) :
     var myExhibitions: List<ExhibitionEntity>? = null
     private var clickListener: OnItemClickListener? = null
     private var deleteListener: OnDeleteClickListener? = null
-    private var ratingBarListener: OnRatingBarListener? = null
     private var modifyListener: OnModifyListener? = null
     private var cameraListener: OnCameraListener? = null
 
@@ -95,12 +94,7 @@ class ExhibitionAdapter(private val layoutId: Int) :
         fun onDeleteClick(exhibitionEntity: ExhibitionEntity)
     }
 
-    interface OnRatingBarListener {
-        fun onRatingChanged(exhibition: ExhibitionEntity, rating: Float)
-    }
-
     interface OnModifyListener {
-        //수정
         fun onModifyChanged(exhibition: ExhibitionEntity)
     }
 
@@ -181,23 +175,24 @@ class ExhibitionVisitedHolder(
             itemBinding.tvTitle.text = it.name
             itemBinding.etMemo.setText(it.memo)
             Glide.with(itemView.context).load(exhibition.mainImage).into(itemBinding.imageView)
-            // 현재 별점 보여주기
             itemBinding.ratingBar.rating = it.score ?: 0f
             itemBinding.tvScore.text = it.score.toString()
 
+            // 삭제 버튼
             itemBinding.btnDelete.setOnClickListener {
                 deleteListener?.onDeleteClick(exhibition)
             }
 
-            // 변경된 별점과 메모를 임시로 저장할 변수 (tofh)
+            // 새로운 별점 저장 변수
             var newRating: Float = exhibition.score ?: 0f
 
-            // 별점 변경 리스너 (tofh)
+            // 별점 변경
             itemBinding.ratingBar.onRatingBarChangeListener =
                 RatingBar.OnRatingBarChangeListener { _, rating, _ ->
                     newRating = rating
                 }
 
+            // 정보 수정 버튼
             itemBinding.btnSave.setOnClickListener {
                 val latestMemo = itemBinding.etMemo.text.toString()
 
@@ -209,12 +204,12 @@ class ExhibitionVisitedHolder(
                 }
             }
 
-
             // 카메라 호출
             itemBinding.imageView.setOnClickListener {
                 cameraListener?.onCameraClick(exhibition!!)
             }
 
+            // 카메라 이미지로
             exhibition?.imagePath?.let { path ->
                 Glide.with(itemView.context)
                     .load(File(path))

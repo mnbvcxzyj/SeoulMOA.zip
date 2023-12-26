@@ -89,7 +89,6 @@ class VisitedActivity : BaseActivity(), ExhibitionAdapter.OnCameraListener {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@VisitedActivity, "사진이 저장되었습니다!", Toast.LENGTH_SHORT)
                             .show()
-                        // 어댑터를 통해 RecyclerView 업데이트
                         adapter.notifyDataSetChanged()
                     }
                 }

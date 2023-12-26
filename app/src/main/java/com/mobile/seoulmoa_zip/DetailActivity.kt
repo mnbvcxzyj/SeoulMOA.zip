@@ -3,7 +3,6 @@ package com.mobile.seoulmoa_zip
 import BaseActivity
 import android.content.ContentValues.TAG
 import android.location.Geocoder
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -18,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.gson.Gson
@@ -27,7 +25,6 @@ import com.mobile.seoulmoa_zip.data.ExhibitionDB
 import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.data.NearbySearchResponse
 import com.mobile.seoulmoa_zip.databinding.ActivityDetailBinding
-import com.mobile.seoulmoa_zip.manager.FileManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -141,7 +138,7 @@ class DetailActivity : BaseActivity(){
                     fetchNearbyCafes(latLng)
                 } else {
                     detailBinding.tvLocation.text = "주소가 제공되지 않습니다."
-                    Toast.makeText(this@DetailActivity, "주소가 제공되지 않습니다.", LENGTH_SHORT)
+                    Toast.makeText(this@DetailActivity, "⚠️주소가 제공되지 않습니다.", LENGTH_SHORT)
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Geocoder 실패: ", e)
@@ -162,7 +159,6 @@ class DetailActivity : BaseActivity(){
         val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "keyword=&location=$latitude,$longitude&radius=$radiusInMeters&type=cafe&key=$apiKey"
 
         Log.d(TAG, url)
-        // 요청 생성
         val request = Request.Builder().url(url).build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -234,7 +230,7 @@ class DetailActivity : BaseActivity(){
                 // 에러 처리
                 Log.e(TAG, "Failed to save exhibition", e)
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DetailActivity, "저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@DetailActivity, "⚠️ 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
