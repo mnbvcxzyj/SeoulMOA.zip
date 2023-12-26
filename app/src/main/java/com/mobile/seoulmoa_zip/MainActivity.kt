@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mobile.seoulmoa_zip.data.Exhibition
-import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.data.ExhibitionRoot
 import com.mobile.seoulmoa_zip.databinding.ActivityMainBinding
 import com.mobile.seoulmoa_zip.network.IExhibitionService

@@ -1,5 +1,9 @@
 package com.mobile.seoulmoa_zip.ui
 
+import android.content.ContentValues
+import android.content.ContentValues.TAG
+import android.nfc.Tag
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +16,7 @@ import com.mobile.seoulmoa_zip.data.ExhibitionEntity
 import com.mobile.seoulmoa_zip.databinding.ListItemBinding
 import com.mobile.seoulmoa_zip.databinding.LikelistItemBinding
 import com.mobile.seoulmoa_zip.databinding.VisitedlistItemBinding
+import java.io.File
 
 
 class ExhibitionAdapter(private val layoutId: Int) :
@@ -21,7 +26,8 @@ class ExhibitionAdapter(private val layoutId: Int) :
     private var clickListener: OnItemClickListener? = null
     private var deleteListener: OnDeleteClickListener? = null
     private var ratingBarListener: OnRatingBarListener? = null
-    private var modifyListener : OnModifyListener? = null
+    private var modifyListener: OnModifyListener? = null
+    private var cameraListener: OnCameraListener? = null
 
     companion object {
         val TYPE_MAIN = R.layout.list_item
@@ -71,8 +77,11 @@ class ExhibitionAdapter(private val layoutId: Int) :
             is ExhibitionMainHolder -> holder.bind(exhibitions?.get(position), clickListener)
             is ExhibitionLikeHolder -> holder.bind(myExhibitions?.get(position), deleteListener)
             is ExhibitionVisitedHolder -> modifyListener?.let {
-                holder.bind(myExhibitions?.get(position), deleteListener, ratingBarListener,
-                    it
+                holder.bind(
+                    myExhibitions?.get(position),
+                    deleteListener,
+                    modifyListener,
+                    cameraListener
                 )
             }
         }
@@ -85,12 +94,18 @@ class ExhibitionAdapter(private val layoutId: Int) :
     interface OnDeleteClickListener {
         fun onDeleteClick(exhibitionEntity: ExhibitionEntity)
     }
+
     interface OnRatingBarListener {
         fun onRatingChanged(exhibition: ExhibitionEntity, rating: Float)
     }
 
     interface OnModifyListener {
+        //수정
         fun onModifyChanged(exhibition: ExhibitionEntity)
+    }
+
+    interface OnCameraListener {
+        fun onCameraClick(exhibition: ExhibitionEntity)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
@@ -101,12 +116,13 @@ class ExhibitionAdapter(private val layoutId: Int) :
         this.deleteListener = listener
     }
 
-    fun setOnRatingBarListener(listner: OnRatingBarListener) {
-        this.ratingBarListener = listner
+
+    fun setOnModifyListener(listener: OnModifyListener) {
+        this.modifyListener = listener
     }
 
-    fun setOnModifyListener(listener : OnModifyListener){
-        this.modifyListener = listener
+    fun setOnCameraListener(listener: OnCameraListener) {
+        this.cameraListener = listener
     }
 
 
@@ -135,7 +151,10 @@ class ExhibitionMainHolder(
 class ExhibitionLikeHolder(
     private val itemBinding: LikelistItemBinding
 ) : RecyclerView.ViewHolder(itemBinding.root) {
-    fun bind(exhibitionEntity: ExhibitionEntity?, deleteListener: ExhibitionAdapter.OnDeleteClickListener?) {
+    fun bind(
+        exhibitionEntity: ExhibitionEntity?,
+        deleteListener: ExhibitionAdapter.OnDeleteClickListener?
+    ) {
         exhibitionEntity?.let { exhibition ->
             itemBinding.tvTitle.text = exhibition.name
             itemBinding.tvText.text = exhibition.info
@@ -150,51 +169,59 @@ class ExhibitionLikeHolder(
 
 
 class ExhibitionVisitedHolder(
-    private val itemBinding: VisitedlistItemBinding
+    private val itemBinding: VisitedlistItemBinding,
 ) : RecyclerView.ViewHolder(itemBinding.root) {
     fun bind(
         exhibition: ExhibitionEntity?,
         deleteListener: ExhibitionAdapter.OnDeleteClickListener?,
-        ratingBarListener: ExhibitionAdapter.OnRatingBarListener?,
-        modifyListener: ExhibitionAdapter.OnModifyListener
+        modifyListener: ExhibitionAdapter.OnModifyListener?,
+        cameraListener: ExhibitionAdapter.OnCameraListener?
     ) {
         exhibition?.let {
             itemBinding.tvTitle.text = it.name
             itemBinding.etMemo.setText(it.memo)
             Glide.with(itemView.context).load(exhibition.mainImage).into(itemBinding.imageView)
+            // 현재 별점 보여주기
+            itemBinding.ratingBar.rating = it.score ?: 0f
+            itemBinding.tvScore.text = it.score.toString()
 
             itemBinding.btnDelete.setOnClickListener {
                 deleteListener?.onDeleteClick(exhibition)
             }
 
-            // 현재 별점 보여주기
-            itemBinding.ratingBar.rating = it.score ?: 0f
-            itemBinding.tvScore.text = it.score.toString()
+            // 변경된 별점과 메모를 임시로 저장할 변수 (tofh)
+            var newRating: Float = exhibition.score ?: 0f
 
-            itemBinding.ratingBar.onRatingBarChangeListener = RatingBar.OnRatingBarChangeListener { _, rating, _ ->
-                it.score = rating
-                ratingBarListener?.onRatingChanged(it, rating)
-            }
+            // 별점 변경 리스너 (tofh)
+            itemBinding.ratingBar.onRatingBarChangeListener =
+                RatingBar.OnRatingBarChangeListener { _, rating, _ ->
+                    newRating = rating
+                }
 
-            // 메모 표시
-            itemBinding.etMemo.setText(it.memo)
+            itemBinding.btnSave.setOnClickListener {
+                val latestMemo = itemBinding.etMemo.text.toString()
 
-            itemBinding.etMemo.setOnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus) {
-                    val memoText = itemBinding.etMemo.text.toString()
-                    exhibition.memo = memoText
+                if (exhibition.score != newRating || exhibition.memo != latestMemo) {
+                    exhibition.score = newRating
+                    exhibition.memo = latestMemo
+
+                    modifyListener?.onModifyChanged(exhibition)
                 }
             }
 
-            // 변경 사항 저장 버튼
-            itemBinding.btnSave.setOnClickListener {
-                val newMemo = itemBinding.etMemo.text.toString()
-                exhibition?.memo = newMemo
-                modifyListener?.onModifyChanged(exhibition!!)
+
+            // 카메라 호출
+            itemBinding.imageView.setOnClickListener {
+                cameraListener?.onCameraClick(exhibition!!)
             }
 
+            exhibition?.imagePath?.let { path ->
+                Glide.with(itemView.context)
+                    .load(File(path))
+                    .into(itemBinding.imageView)
+            }
 
         }
     }
-
 }
+

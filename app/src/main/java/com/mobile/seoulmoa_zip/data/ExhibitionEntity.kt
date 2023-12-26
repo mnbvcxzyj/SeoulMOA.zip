@@ -20,5 +20,6 @@ data class ExhibitionEntity(
     var isLiked: Boolean?,
     var isVisited: Boolean?,
     var score: Float?,
-    var memo : String? = "메모를 입력하세요"
+    var memo : String? = "메모를 입력하세요",
+    var imagePath: String? = null
 )

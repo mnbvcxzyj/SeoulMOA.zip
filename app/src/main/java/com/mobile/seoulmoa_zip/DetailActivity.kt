@@ -43,23 +43,14 @@ class DetailActivity : BaseActivity(){
     private lateinit var detailBinding: ActivityDetailBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geocoder: Geocoder
-    private lateinit var currentLoc: Location
     private val database by lazy { ExhibitionDB.getDatabase(this) }
-
-    val fileManager: FileManager by lazy {
-        FileManager(applicationContext)
-    }
 
     // 지도 저장 하는 멤버 변수
     private lateinit var googleMap: GoogleMap
-    var centerMarker: Marker? = null
 
-    // 이미지 변수
-    var img: String? = null
-
+    var exhibition : Exhibition? = null
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         detailBinding = ActivityDetailBinding.inflate(layoutInflater)
@@ -78,16 +69,8 @@ class DetailActivity : BaseActivity(){
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(mapReadyCallback)
 
-//        val exhibition = intent.getSerializableExtra("exhibition") as? Exhibition
 
-        val exhibition = intent.extras?.getSerializable("exhibition") as? Exhibition
-
-        exhibition?.let {
-            showExhibitionDetails(it)
-            mapFragment.getMapAsync { googleMap ->
-                placeMarker(geocoder, it.place, googleMap)
-            }
-        }
+        exhibition = intent.extras?.getSerializable("exhibition") as? Exhibition
 
 // 좋아요 버튼 클릭 리스너
         detailBinding.btnLike.setOnClickListener {
@@ -140,6 +123,8 @@ class DetailActivity : BaseActivity(){
     val mapReadyCallback = object: OnMapReadyCallback {
         override fun onMapReady(map: GoogleMap) {
             googleMap = map
+            showExhibitionDetails(exhibition!!)
+            placeMarker(geocoder, exhibition?.place, googleMap)
         }
     }
     fun placeMarker(geocoder: Geocoder, address: String?, googleMap: GoogleMap) {
@@ -154,8 +139,6 @@ class DetailActivity : BaseActivity(){
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16F))
 
                     fetchNearbyCafes(latLng)
-
-//                    fetchNearbyCafes(latLng)
                 } else {
                     detailBinding.tvLocation.text = "주소가 제공되지 않습니다."
                     Toast.makeText(this@DetailActivity, "주소가 제공되지 않습니다.", LENGTH_SHORT)
@@ -173,15 +156,15 @@ class DetailActivity : BaseActivity(){
         val client = OkHttpClient()
         val latitude = location.latitude
         val longitude = location.longitude
-
+        val apiKey = getString(R.string.map_key)
         val radiusInMeters = 1500
 
-        val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "keyword=&location=$latitude,$longitude&radius=$radiusInMeters&type=cafe&key=${R.string.map_key}"
+        val url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "keyword=&location=$latitude,$longitude&radius=$radiusInMeters&type=cafe&key=$apiKey"
 
+        Log.d(TAG, url)
         // 요청 생성
         val request = Request.Builder().url(url).build()
 
-        // 비동기적으로 요청 실행
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -207,7 +190,7 @@ class DetailActivity : BaseActivity(){
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
                             }
                         } catch (e: Exception) {
-                            Log.e(TAG, "Error parsing JSON or adding markers", e)
+                            Log.e(TAG, "에러 발생", e)
                         }
                     }
                 }
