@@ -49,6 +49,7 @@
 <br/>
 
 ## 🖥️ 기술 설명 
+- **Google Cloud**의 GoogleMap과 Google Places API 사용 
 - **Retrofit**과 **GsonConverter**를 사용하여 API 통신 및 응답 처리. 
 - cleanHTMLString 함수를 작성하여 API 정보 중 HTML 태그나 특수문자를 제거
 - **Glide**를 사용하여 이미지 처리 
