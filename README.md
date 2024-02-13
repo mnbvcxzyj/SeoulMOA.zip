@@ -13,9 +13,10 @@
 <br/>
 
 ## 📁 프로젝트 기획서 
-사용자가 원하는 전시회를 쉽게 찾고, 관심 있는 전시회를 저장하며, 방문한 전시회에 대한 평가를 기록할 수 있고, 미술관 주변의 카페 정보를 알려주는 기능도 있다면 편리할 거 같아서 해당 애플리케이션을 기획하였습니다. 
 
 **기획서 바로가기** 👉🏻 https://good-vein-bae.notion.site/46977f2b5f2f43e694bdeefede8f5c5e
+
+
 
 <br/>
 
@@ -50,7 +51,7 @@
 
 ## 🖥️ 기술 설명 
 - **Google Cloud**의 GoogleMap과 Google Places API 사용 
-- **Retrofit**과 **GsonConverter**를 사용하여 API 통신 및 응답 처리. 
+- **Retrofit**과 **GsonConverter**를 사용하여 API 통신 및 응답 처리
 - cleanHTMLString 함수를 작성하여 API 정보 중 HTML 태그나 특수문자를 제거
 - **Glide**를 사용하여 이미지 처리 
 - **Room Database**를 사용하여 관심 전시, 다녀온 전시 정보 저장 및 관리 
